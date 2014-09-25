@@ -8,7 +8,7 @@ module PageObject
     # matching the Hash key to the name you provided when declaring
     # the element on your page.
     #
-    # Checkboxe and Radio Button values must be true or false.
+    # Checkboxes and Radio Button values must be true or false.
     #
     # @example
     #   class ExamplePage
@@ -35,6 +35,7 @@ module PageObject
         populate_radiobuttongroup(key, value) if is_radiobuttongroup?(key)
         populate_radiobutton(key, value) if is_radiobutton?(key) and is_enabled?(key)
         populate_text(key, value) if is_text?(key) and is_enabled?(key)
+        populate_label(key, value) if is_label?(key)
       end
     end
 
@@ -51,10 +52,16 @@ module PageObject
 
     def populate_radiobutton(key, value)
       return self.send "select_#{key}" if value
+      return self.send "clear_#{key}"
     end
 
     def populate_radiobuttongroup(key, value)
       return self.send("select_#{key}", value)
+    end
+
+    def populate_label(key, value)
+      puts "#{key} #{value}"
+      # return self.send "choose_#{key}"
     end
 
     def is_text?(key)
@@ -71,6 +78,10 @@ module PageObject
 
     def is_radiobuttongroup?(key)
       respond_to?("select_#{key}".to_sym) and respond_to?("#{key}_values")
+    end
+
+    def is_label?(key)
+      # respond_to?("choose_#{key}".to_sym)
     end
 
     def is_enabled?(key)
