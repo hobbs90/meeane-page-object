@@ -404,7 +404,7 @@ module PageObject
     end
 
     #
-    # adds four methods - one to select, another to return if a radio button 
+    # adds five methods - one to select, another to return if a radio button
     # is selected, another method to return a PageObject::Elements::RadioButton
     # object representing the radio button element, and another to check
     # the radio button's existence.
@@ -1017,6 +1017,10 @@ module PageObject
     #
     def label(name, identifier={:index => 0}, &block)
       standard_methods(name, identifier, 'label_for', &block)
+      define_method("choose_#{name}") do
+        return platform.choose_label(identifier.clone) unless block_given?
+        self.send("#{name}_element").click
+      end
       define_method(name) do
         return platform.label_text_for identifier.clone unless block_given?
         self.send("#{name}_element").text
