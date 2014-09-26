@@ -40,7 +40,7 @@ module PageObject
     end
 
     private
-    
+
     def populate_text(key, value)
       self.send "#{key}=", value
     end
@@ -60,8 +60,7 @@ module PageObject
     end
 
     def populate_label(key, value)
-      puts "#{key} #{value}"
-      # return self.send "choose_#{key}"
+      return self.send "choose_#{key}"
     end
 
     def is_text?(key)
@@ -81,7 +80,7 @@ module PageObject
     end
 
     def is_label?(key)
-      # respond_to?("choose_#{key}".to_sym)
+      respond_to?("choose_#{key}".to_sym)
     end
 
     def is_enabled?(key)
