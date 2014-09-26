@@ -807,6 +807,14 @@ module PageObject
         end
 
         #
+        # platform method to return a PageObject::Element::Label element
+        # See PageObject::Accessors#label
+        #
+        def choose_label(identifier)
+          process_watir_call("label(identifier).click", Elements::Label, identifier, 'label')
+        end
+
+        #
         #
         # platform method to retrieve an array of label elements
         #

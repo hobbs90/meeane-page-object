@@ -404,7 +404,7 @@ module PageObject
     end
 
     #
-    # adds five methods - one to select, another to return if a radio button
+    # adds four methods - one to select, another to return if a radio button
     # is selected, another method to return a PageObject::Elements::RadioButton
     # object representing the radio button element, and another to check
     # the radio button's existence.
