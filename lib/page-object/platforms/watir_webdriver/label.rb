@@ -8,6 +8,7 @@ module PageObject
         #
         def choose
           element.click
+          wait_for_ajax
         end
 
       end
