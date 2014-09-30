@@ -38,7 +38,7 @@ Taken together these new facilities will hugely reduce the amount of code we nee
 
 ## Improvements
 
-Suggested improvements would be to add a facility to interact with the address widgets on the pages. I'll look to add these at a later date but will use a different approach rather than forking the master as page-object gem already has an extension point that allows us to define our own Element types and register them with the gem. This would seem a better approach.
+Suggested improvements would be to add a facility to interact with the address widgets on the Columbus Direct pages. I'll look to add these at a later date but will use a different approach rather than forking the master as page-object gem already has an extension point that allows us to define our own Element types and register them with the gem. This would seem a better approach.
 
 ## Documentation
 
