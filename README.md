@@ -27,6 +27,17 @@ The populate_page_with method will pick these elements in exactly the same way a
 populate_page_with = data_for(:my_details, data)
 ````
 
+Additional Setup
+Many of the labels on the Columbus Direct websites (including Household & Travel) initiate an AJAX call using jQuery so the choose_ method calls wait_for_ajax to check that the page has been updated completely before moving on. For this to work you need to declare the javascript library your website is using. Add the following to your env.rb file:
+
+````ruby
+PageObject.javascript_framework = :jquery
+````
+
+Taken together these new facilities will hugely reduce the amount of code we need to write to automate the Columbus Direct websites and we would strongly encourage there use.
+
+Suggested improvements would be to add a facility to interact with the address widgets on the pages. I'll look to add these at a later date but will use a different approach ratyher than forking the master as page-object gem already has an extension point that allows us to define our own Element types and register them with the gem.
+
 ## Documentation
 
 The project [wiki](https://github.com/cheezy/page-object/wiki/page-object) is the first place to go to learn about how to use page-object.
