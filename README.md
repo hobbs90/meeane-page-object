@@ -27,7 +27,7 @@ The populate_page_with method will pick these elements in exactly the same way a
 populate_page_with = data_for(:my_details, data)
 ````
 
-# Additional Setup
+#### Additional Setup
 Many of the labels on the Columbus Direct websites (including Household & Travel) initiate an AJAX call using jQuery so the choose_ methods generated call wait_for_ajax to check the page has been updated before moving on. For this to work you need to declare the javascript library your website is using. Add the following to your env.rb file for the Columbus Direct websites:
 
 ````ruby
