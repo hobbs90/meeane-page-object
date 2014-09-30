@@ -3,7 +3,7 @@ $:.push File.expand_path("../lib", __FILE__)
 require "page-object/version"
 
 Gem::Specification.new do |s|
-  s.name = "collinson-page-object"
+  s.name = "meeane-page-object"
   s.version = PageObject::VERSION
   s.platform = Gem::Platform::RUBY
   s.authors = ["Jeff Morgan/Steven Hobbs"]

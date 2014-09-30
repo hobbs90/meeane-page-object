@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/cheezy/page-object.png)](https://travis-ci.org/cheezy/page-object)
 
 
-A simple gem fork that assists in creating flexible page objects for testing browser based applications used on Collinson websites. The goal is to facilitate creating abstraction layers in your tests to decouple the tests from the item they are testing and to provide a simple interface to the elements on a page. It works with both watir-webdriver and selenium-webdriver.
+A simple gem fork that assists in creating flexible page objects for testing browser based applications used on Columbus Direct websites. The goal is to facilitate creating abstraction layers in your tests to decouple the tests from the item they are testing and to provide a simple interface to the elements on a page. It works with both watir-webdriver and selenium-webdriver.
 
 The main additions from the master gem are to extend the accessors to find and interact with the particular style of radio buttons used on the Collinson sites. Also, I have extended the populate_page method to work with these page element and wait for any AJAX request these initiate. They work in the same way as the normal radio buttons but rather than using select_ we use choose_.
 
