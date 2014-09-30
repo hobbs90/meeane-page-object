@@ -7,9 +7,9 @@ A simple gem fork that assists in creating flexible page objects for testing bro
 
 The main additions from the master gem are to extend the accessors to find and interact with the particular style of radio buttons used on the Columbus Direct websites. Also, I have extended the populate_page method to work with these page element and wait for any AJAX requests these initiate. They work in the same way as the normal radio buttons but rather than using select_ we use choose_.
 
-## Additional methods over original gem
+## Additional Methods Over Original Gem
 
-I've added the ability to access the labels styled as radio buttons. So now, you can declare these elements using:
+I've added the ability to access the labels styled as radio buttons on Columbus Direct websites. So now, you can declare these elements using:
 
 ````ruby
 label(:has_legal_expenses_cover_yes, :for => 'HasLegalExpensesCover_Yes')
@@ -21,7 +21,7 @@ This will add a method in addition to the usual methods PageObjects creates for 
 choose_has_legal_expenses_cover_yes
 ````
 
-The populate_page_with method will pick these elements in exactly the same way as normal radio buttons. This means you can complete any page in the normal way.
+The populate_page_with method will pick these elements in exactly the same way as normal radio buttons. This means you can complete any page in the normal way using populate_page_wit without having to write any extra code.
 
 ````ruby
 populate_page_with = data_for(:my_details, data)
@@ -36,7 +36,9 @@ PageObject.javascript_framework = :jquery
 
 Taken together these new facilities will hugely reduce the amount of code we need to write to automate the Columbus Direct websites and we would strongly encourage there use.
 
-Suggested improvements would be to add a facility to interact with the address widgets on the pages. I'll look to add these at a later date but will use a different approach ratyher than forking the master as page-object gem already has an extension point that allows us to define our own Element types and register them with the gem.
+## Improvements
+
+Suggested improvements would be to add a facility to interact with the address widgets on the pages. I'll look to add these at a later date but will use a different approach rather than forking the master as page-object gem already has an extension point that allows us to define our own Element types and register them with the gem. This would seem a better approach.
 
 ## Documentation
 
