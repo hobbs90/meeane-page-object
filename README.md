@@ -1,7 +1,5 @@
 # meeane-page-object
 
-[![Build Status](https://travis-ci.org/cheezy/page-object.png)](https://travis-ci.org/cheezy/page-object)
-
 A simple fork of Jeff Morgan's page-object gem that assists in creating flexible page objects for testing Columbus Direct websites. The goal is to facilitate creating abstraction layers in your tests to decouple the tests from the items they are testing and to provide a simple interface to the elements on a page. It works with both watir-webdriver and selenium-webdriver.
 
 The main additions over the original page-object gem are to extend the accessors to find and interact with the particular style of radio buttons used on the Columbus Direct websites. Also, I have extended the _populate_page_with_ method to work with these page element and wait for any AJAX requests these initiate. They work in the same way as the normal radio buttons but rather than using _select_ we use _choose_.
