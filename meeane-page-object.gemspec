@@ -9,11 +9,11 @@ Gem::Specification.new do |s|
   s.authors = ["Jeff Morgan/Steven Hobbs"]
   s.email = ["stevenhobbs@meeane.co.uk"]
   s.license       = 'MIT'
-  s.homepage = "http://github.com/cheezy/page-object"
-  s.summary = %q{Page Object DSL for browser testing Collinson websites based on Jeff Morgan's page-object gem (version 1.0.2}
+  s.homepage = "https://github.com/hobbs90/page-object"
+  s.summary = %q{Page Object DSL for browser testing Columbus Direct websites based on Jeff Morgan's page-object gem (version 1.0.2}
   s.description = %q{Page Object DSL that works with both Watir and Selenium}
 
-  s.rubyforge_project = "collinson-page-object"
+  s.rubyforge_project = "meeane-page-object"
 
   s.files = `git ls-files`.split("\n")
   s.test_files = `git ls-files -- {test,spec,features}/*`.split("\n")
