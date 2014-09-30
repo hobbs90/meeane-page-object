@@ -1,15 +1,15 @@
-# page-object
+# meeane-page-object
 
 [![Build Status](https://travis-ci.org/cheezy/page-object.png)](https://travis-ci.org/cheezy/page-object)
 
 
-A simple gem fork that assists in creating flexible page objects for testing browser based applications used on Columbus Direct websites. The goal is to facilitate creating abstraction layers in your tests to decouple the tests from the items they are testing and to provide a simple interface to the elements on a page. It works with both watir-webdriver and selenium-webdriver.
+A simple fork of Jeff Morgan's page-object gem that assists in creating flexible page objects for testing Columbus Direct websites. The goal is to facilitate creating abstraction layers in your tests to decouple the tests from the items they are testing and to provide a simple interface to the elements on a page. It works with both watir-webdriver and selenium-webdriver.
 
-The main additions from the master gem are to extend the accessors to find and interact with the particular style of radio buttons used on the Columbus Direct websites. Also, I have extended the populate_page method to work with these page element and wait for any AJAX requests these initiate. They work in the same way as the normal radio buttons but rather than using select_ we use choose_.
+The main additions from the original page-object gem are to extend the accessors to find and interact with the particular style of radio buttons used on the Columbus Direct websites. Also, I have extended the populate_page_with method to work with these page element and wait for any AJAX requests these initiate. They work in the same way as the normal radio buttons but rather than using select_ we use choose_.
 
 ## Additional Methods Over Original Gem
 
-I've added the ability to access the labels styled as radio buttons on Columbus Direct websites. So now, you can declare these elements using:
+You can declare these elements using:
 
 ````ruby
 label(:has_legal_expenses_cover_yes, :for => 'HasLegalExpensesCover_Yes')
@@ -21,20 +21,18 @@ This will add a method in addition to the usual methods PageObjects creates for 
 choose_has_legal_expenses_cover_yes
 ````
 
-The populate_page_with method will pick these elements in exactly the same way as normal radio buttons. This means you can complete any page in the normal way using populate_page_wit without having to write any extra code.
+The populate_page_with method will pick these elements in exactly the same way as normal radio buttons. This means you can complete any page in the normal way using populate_page_with without having to write any extra code.
 
 ````ruby
 populate_page_with = data_for(:my_details, data)
 ````
 
 Additional Setup
-Many of the labels on the Columbus Direct websites (including Household & Travel) initiate an AJAX call using jQuery so the choose_ method calls wait_for_ajax to check that the page has been updated completely before moving on. For this to work you need to declare the javascript library your website is using. Add the following to your env.rb file:
+Many of the labels on the Columbus Direct websites (including Household & Travel) initiate an AJAX call using jQuery so the choose_ methods generated call wait_for_ajax to check the page has been updated before moving on. For this to work you need to declare the javascript library your website is using. Add the following to your env.rb file for the Columbus Direct websites:
 
 ````ruby
 PageObject.javascript_framework = :jquery
 ````
-
-Taken together these new facilities will hugely reduce the amount of code we need to write to automate the Columbus Direct websites and we would strongly encourage there use.
 
 ## Improvements
 
