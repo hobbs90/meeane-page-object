@@ -4,9 +4,9 @@ A simple fork of Jeff Morgan's page-object gem that assists in creating flexible
 
 The main additions over the original page-object gem are to extend the accessors to find and interact with the particular style of radio buttons used on the Columbus Direct websites. Also, I have extended the _populate_page_with_ method to work with these page element and wait for any AJAX requests these initiate. They work in the same way as the normal radio buttons but rather than using _select_ we use _choose_.
 
-## Additional Methods Over Original Gem
+## Additional Methods Added
 
-You can declare these elements using:
+You can declare these label elements using:
 
 ````ruby
 label(:has_legal_expenses_cover_yes, :for => 'HasLegalExpensesCover_Yes')
@@ -18,14 +18,14 @@ This will add a _choose_ method in addition to the usual methods PageObjects cre
 choose_has_legal_expenses_cover_yes
 ````
 
-The _populate_page_with method will pick these elements in exactly the same way as normal radio buttons. This means you can complete any page in the normal way using _populate_page_with_ without having to write any extra code.
+The _populate_page_with method will pick these elements in exactly the same way as normal radio buttons. This means you can complete each page in the normal way using _populate_page_with_ without having to write any extra code.
 
 ````ruby
 populate_page_with = data_for(:my_details, data)
 ````
 
 #### Additional Setup
-Many of the labels on the Columbus Direct websites (including Household & Travel) initiate an AJAX call using jQuery so the _choose_ methods generated _call wait_for_ajax_ to check the page has been updated before moving on. For this to work you need to declare the javascript library your website is using. Add the following to your env.rb file for the Columbus Direct websites:
+Many of the labels on the Columbus Direct websites (including Household & Travel) initiate an AJAX call using jQuery so the _choose_ methods generated call _wait_for_ajax_ to check the page has been updated before moving on. For this to work you need to declare the javascript library your website is using. Add the following to your env.rb file for the Columbus Direct websites:
 
 ````ruby
 PageObject.javascript_framework = :jquery
