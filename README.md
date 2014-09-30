@@ -3,20 +3,29 @@
 [![Build Status](https://travis-ci.org/cheezy/page-object.png)](https://travis-ci.org/cheezy/page-object)
 
 
-A simple gem fork that assists in creating flexible page objects for testing browser based applications used on Columbus Direct websites. The goal is to facilitate creating abstraction layers in your tests to decouple the tests from the item they are testing and to provide a simple interface to the elements on a page. It works with both watir-webdriver and selenium-webdriver.
+A simple gem fork that assists in creating flexible page objects for testing browser based applications used on Columbus Direct websites. The goal is to facilitate creating abstraction layers in your tests to decouple the tests from the items they are testing and to provide a simple interface to the elements on a page. It works with both watir-webdriver and selenium-webdriver.
 
-The main additions from the master gem are to extend the accessors to find and interact with the particular style of radio buttons used on the Collinson sites. Also, I have extended the populate_page method to work with these page element and wait for any AJAX request these initiate. They work in the same way as the normal radio buttons but rather than using select_ we use choose_.
+The main additions from the master gem are to extend the accessors to find and interact with the particular style of radio buttons used on the Columbus Direct websites. Also, I have extended the populate_page method to work with these page element and wait for any AJAX requests these initiate. They work in the same way as the normal radio buttons but rather than using select_ we use choose_.
 
-So, you can declare these elements using
+## Additional methods over original gem
 
+I've added the ability to access the labels styled as radio buttons. So now, you can declare these elements using:
+
+````ruby
 label(:has_legal_expenses_cover_yes, :for => 'HasLegalExpensesCover_Yes')
+````
 
-and then call this using
+This will add a method in addition to the usual methods PageObjects creates for labels which allow you to select the element as you would a normal radio button. Call this using:
 
+````ruby
 choose_has_legal_expenses_cover_yes
+````
 
-The populate_page method will pick these elements in exactly the same way as normal radio buttons.
+The populate_page_with method will pick these elements in exactly the same way as normal radio buttons. This means you can complete any page in the normal way.
 
+````ruby
+populate_page_with = data_for(:my_details, data)
+````
 
 ## Documentation
 
