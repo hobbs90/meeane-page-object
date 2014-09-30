@@ -3,17 +3,17 @@ $:.push File.expand_path("../lib", __FILE__)
 require "page-object/version"
 
 Gem::Specification.new do |s|
-  s.name = "page-object"
+  s.name = "collinson-page-object"
   s.version = PageObject::VERSION
   s.platform = Gem::Platform::RUBY
   s.authors = ["Jeff Morgan/Steven Hobbs"]
-  s.email = ["jeff.morgan@leandog.com"]
+  s.email = ["stevenhobbs@meeane.co.uk"]
   s.license       = 'MIT'
   s.homepage = "http://github.com/cheezy/page-object"
-  s.summary = %q{Page Object DSL for browser testing}
+  s.summary = %q{Page Object DSL for browser testing Collinson websites based on Jeff Morgan's page-object gem (version 1.0.2}
   s.description = %q{Page Object DSL that works with both Watir and Selenium}
 
-  s.rubyforge_project = "page-object"
+  s.rubyforge_project = "collinson-page-object"
 
   s.files = `git ls-files`.split("\n")
   s.test_files = `git ls-files -- {test,spec,features}/*`.split("\n")

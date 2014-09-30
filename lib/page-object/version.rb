@@ -1,4 +1,4 @@
 module PageObject
   # @private
-  VERSION = "0.9.6"
+  VERSION = "0.1.0"
 end
