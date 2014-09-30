@@ -4,7 +4,7 @@
 
 A simple fork of Jeff Morgan's page-object gem that assists in creating flexible page objects for testing Columbus Direct websites. The goal is to facilitate creating abstraction layers in your tests to decouple the tests from the items they are testing and to provide a simple interface to the elements on a page. It works with both watir-webdriver and selenium-webdriver.
 
-The main additions over the original page-object gem are to extend the accessors to find and interact with the particular style of radio buttons used on the Columbus Direct websites. Also, I have extended the _populate_page_with method to work with these page element and wait for any AJAX requests these initiate. They work in the same way as the normal radio buttons but rather than using _select_ we use _choose_.
+The main additions over the original page-object gem are to extend the accessors to find and interact with the particular style of radio buttons used on the Columbus Direct websites. Also, I have extended the _populate_page_with_ method to work with these page element and wait for any AJAX requests these initiate. They work in the same way as the normal radio buttons but rather than using _select_ we use _choose_.
 
 ## Additional Methods Over Original Gem
 
@@ -20,14 +20,14 @@ This will add a _choose_ method in addition to the usual methods PageObjects cre
 choose_has_legal_expenses_cover_yes
 ````
 
-The _populate_page_with method will pick these elements in exactly the same way as normal radio buttons. This means you can complete any page in the normal way using _populate_page_with without having to write any extra code.
+The _populate_page_with method will pick these elements in exactly the same way as normal radio buttons. This means you can complete any page in the normal way using _populate_page_with_ without having to write any extra code.
 
 ````ruby
 populate_page_with = data_for(:my_details, data)
 ````
 
 #### Additional Setup
-Many of the labels on the Columbus Direct websites (including Household & Travel) initiate an AJAX call using jQuery so the _choose_ methods generated _call wait_for_ajax to check the page has been updated before moving on. For this to work you need to declare the javascript library your website is using. Add the following to your env.rb file for the Columbus Direct websites:
+Many of the labels on the Columbus Direct websites (including Household & Travel) initiate an AJAX call using jQuery so the _choose_ methods generated _call wait_for_ajax_ to check the page has been updated before moving on. For this to work you need to declare the javascript library your website is using. Add the following to your env.rb file for the Columbus Direct websites:
 
 ````ruby
 PageObject.javascript_framework = :jquery
@@ -71,7 +71,7 @@ When you include this module numerous methods are added to your class that allow
 class LoginPage
   include PageObject
       
-  text_field(:username, :id => 'username')
+  _(:username, :id => 'username')
   text_field(:password, :id => 'password')
   button(:login, :id => 'login')
 end
