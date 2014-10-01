@@ -18,10 +18,12 @@ This will add a _choose_ method in addition to the usual methods PageObjects cre
 choose_has_legal_expenses_cover_yes
 ````
 
-The _populate_page_with method will pick these elements in exactly the same way as normal radio buttons. This means you can complete each page in the normal way using _populate_page_with_ without having to write any extra code.
+The _populate_page_with_ method will interact with these elements in exactly the same way as normal radio buttons. This means you can complete each page in the usual way using _populate_page_with_ with any parameters read in from an external file without having to write extra code to handle these non-standard radio buttons.
 
 ````ruby
+def complete_details(data = {})
 populate_page_with data_for(:my_details, data)
+end
 ````
 
 #### Additional Setup
