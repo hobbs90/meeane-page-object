@@ -6,7 +6,7 @@ The main additions over the original page-object gem are to extend the accessors
 
 ## Additional Methods Added
 
-You can declare these label elements using:
+You can declare these _label_ elements using:
 
 ````ruby
 label(:has_legal_expenses_cover_yes, :for => 'HasLegalExpensesCover_Yes')
@@ -18,7 +18,7 @@ This will add a _choose_ method in addition to the usual methods PageObjects cre
 choose_has_legal_expenses_cover_yes
 ````
 
-The _populate_page_with method will pick these elements in exactly the same way as normal radio buttons. This means you can complete each page in the normal way using _populate_page_with_ without having to write any extra code.
+The _populate_page_with_ method will pick these elements in exactly the same way as normal radio buttons. This means you can complete each page in the normal way using _populate_page_with_ without having to write any extra code.
 
 ````ruby
 populate_page_with = data_for(:my_details, data)

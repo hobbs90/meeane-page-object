@@ -7,6 +7,7 @@ module PageObject
         # choose the label
         #
         def choose
+          sleep 0.5
           element.click
           wait_for_ajax
         end
