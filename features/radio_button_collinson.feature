@@ -8,9 +8,9 @@ Feature: Collinson Radio Buttons
 
   Scenario: Selecting and clearing a collinson radio button
     When I select the "Individual" collinson radio button
-#    Then the "Individual" collinson radio button should be selected
-#    When I select the "Couple" collinson radio button
-#    Then the "Couple" collinson radio button should be selected
+    Then the "Individual" collinson radio button should be selected
+    When I select the "Couple" collinson radio button
+    Then the "Couple" collinson radio button should be selected
 
   Scenario Outline: Locating collinson radio buttons on the Page
     When I search for the collinson radio button by "<search_by>"
