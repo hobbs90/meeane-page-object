@@ -8,7 +8,7 @@ module PageObject
     # matching the Hash key to the name you provided when declaring
     # the element on your page.
     #
-    # Checkboxes and Radio Button values must be true or false.
+    # Checkboxe and Radio Button values must be true or false.
     #
     # @example
     #   class ExamplePage
