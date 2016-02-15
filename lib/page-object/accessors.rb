@@ -66,19 +66,17 @@ module PageObject
     #
     def wait_for_expected_title(expected_title, timeout=::PageObject.default_element_wait)
       define_method("wait_for_expected_title?") do
-        page_title = title
-        has_expected_title = (expected_title === page_title)
-        if not has_expected_title and not timeout.nil?
-          wait_until(timeout, "Expected title '#{expected_title}' instead of '#{page_title}'") do 
-            has_expected_title = (expected_title === page_title)
-            has_expected_title
-          end
-        end
-        raise "Expected title '#{expected_title}' instead of '#{page_title}'" unless has_expected_title
+        error_message = lambda { "Expected title '#{expected_title}' instead of '#{title}'" }
+
+        has_expected_title = (expected_title === title)
+        wait_until(timeout, error_message.call) do
+          has_expected_title = (expected_title === title)
+        end unless has_expected_title
+
+        raise error_message.call unless has_expected_title
         has_expected_title
       end
     end
-
 
     #
     # Creates a method that compares the expected_title of a page against the actual.
@@ -209,7 +207,7 @@ module PageObject
     #   * :xpath => Watir and Selenium
     # @param optional block to be invoked when element method is called
     #
-    def text_field(name, identifier={:index => 0}, &block) 
+    def text_field(name, identifier={:index => 0}, &block)
       standard_methods(name, identifier, 'text_field_for', &block)
       define_method(name) do
         return platform.text_field_value_for identifier.clone unless block_given?
@@ -638,6 +636,36 @@ module PageObject
       end
     end
     alias_method :td, :cell
+
+
+    #
+    # adds three methods - one to retrieve the text from a table row,
+    # another to return the table row element, and another to check the row's
+    # existence.
+    #
+    # @example
+    #   row(:sums, :id => 'sum_row')
+    #   # will generate 'sums', 'sums_element', and 'sums?' methods
+    #
+    # @param [Symbol] the name used for the generated methods
+    # @param [Hash] identifier how we find a cell.  You can use a multiple parameters
+    #   by combining of any of the following except xpath.  The valid keys are:
+    #   * :class => Watir and Selenium
+    #   * :css => Watir and Selenium
+    #   * :id => Watir and Selenium
+    #   * :index => Watir and Selenium
+    #   * :text => Watir only
+    #   * :xpath => Watir and Selenium
+    #   * :css => Watir and Selenium
+    # @param optional block to be invoked when element method is called
+    #
+    def row(name, identifier={:index => 0}, &block)
+      standard_methods(name, identifier, 'row_for', &block)
+      define_method("#{name}") do
+        return platform.row_text_for identifier.clone unless block_given?
+        self.send("#{name}_element").text
+      end
+    end
 
     #
     # adds two methods - one to retrieve the image element, and another to
@@ -1125,6 +1153,61 @@ module PageObject
     end
 
     #
+    # adds three methods - one to retrieve the text of a b element, another to
+    # retrieve a b element, and another to check for it's existence.
+    #
+    # @example
+    #   b(:bold, :id => 'title')
+    #   # will generate 'bold', 'bold_element', and 'bold?' methods
+    #
+    # @param [Symbol] the name used for the generated methods
+    # @param [Hash] identifier how we find a b.  You can use a multiple parameters
+    #   by combining of any of the following except xpath.  The valid keys are:
+    #   * :class => Watir and Selenium
+    #   * :css => Watir and Selenium
+    #   * :id => Watir and Selenium
+    #   * :index => Watir and Selenium
+    #   * :name => Watir and Selenium
+    #   * :xpath => Watir and Selenium
+    # @param optional block to be invoked when element method is called
+    #
+    def b(name, identifier={:index => 0}, &block)
+      standard_methods(name, identifier,'b_for', &block)
+      define_method(name) do
+        return platform.b_text_for identifier.clone unless block_given?
+        self.send("#{name}_element").text
+      end
+    end
+
+    #
+    # adds three methods - one to retrieve the text of a i element, another to
+    # retrieve a i element, and another to check for it's existence.
+    #
+    # @example
+    #   i(:italic, :id => 'title')
+    #   # will generate 'italic', 'italic_element', and 'italic?' methods
+    #
+    # @param [Symbol] the name used for the generated methods
+    # @param [Hash] identifier how we find a i. You can use a multiple parameters
+    #   by combining of any of the following except xpath.  The valid keys are:
+    #   * :class => Watir and Selenium
+    #   * :css => Watir and Selenium
+    #   * :id => Watir and Selenium
+    #   * :index => Watir and Selenium
+    #   * :name => Watir and Selenium
+    #   * :xpath => Watir and Selenium
+    # @param optional block to be invoked when element method is called
+    #
+    def i(name, identifier={:index => 0}, &block)
+      standard_methods(name, identifier,'i_for', &block)
+      define_method(name) do
+        return platform.i_text_for identifier.clone unless block_given?
+        self.send("#{name}_element").text
+      end
+    end
+    alias_method :icon, :i
+
+    #
     # adds two methods - one to retrieve a svg, and another to check
     # the svg's existence.
     #
@@ -1168,7 +1251,20 @@ module PageObject
     #   * :xpath => Watir and Selenium
     # @param optional block to be invoked when element method is called
     #
-    def element(name, tag, identifier={:index => 0}, &block)
+    def element(name, tag=:element, identifier={ :index => 0 }, &block)
+      # default tag to :element
+      #
+      # element 'button', css: 'some css'
+      #
+      # is the same as
+      #
+      # element 'button', :element, css: 'some css'
+      #
+      if tag.is_a?(Hash)
+        identifier = tag
+        tag        = :element
+      end
+
       define_method("#{name}") do
         self.send("#{name}_element").text
       end
@@ -1201,10 +1297,71 @@ module PageObject
     #   * :xpath => Watir and Selenium
     # @param optional block to be invoked when element method is called
     #
-    def elements(name, tag, identifier={:index => 0}, &block)
+    def elements(name, tag=:element, identifier={:index => 0}, &block)
+      # default tag to :element
+      #
+      # elements 'button', css: 'some css'
+      #
+      # is the same as
+      #
+      # elements 'button', :element, css: 'some css'
+      #
+      if tag.is_a?(Hash)
+        identifier = tag
+        tag        = :element
+      end
+
       define_method("#{name}_elements") do
         return call_block(&block) if block_given?
         platform.elements_for(tag, identifier.clone)
+      end
+    end
+
+    #
+    # adds a method to return a page object rooted at an element
+    #
+    # @example
+    #   page_section(:navigation_bar, NavigationBar, :id => 'nav-bar')
+    #   # will generate 'navigation_bar' and 'navigation_bar?'
+    #
+    # @param [Symbol] the name used for the generated methods
+    # @param [Class] the class to instantiate for the element
+    # @param [Hash] identifier how we find an element.  You can use multiple parameters
+    #   by combining of any of the following except xpath.  The valid keys are:
+    #   * :class => Watir and Selenium
+    #   * :css => Selenium only
+    #   * :id => Watir and Selenium
+    #   * :index => Watir and Selenium
+    #   * :name => Watir and Selenium
+    #   * :xpath => Watir and Selenium
+    #
+    def page_section(name, section_class, identifier)
+      define_method(name) do
+        platform.page_for(identifier, section_class)
+      end
+    end
+
+    #
+    # adds a method to return a collection of page objects rooted at elements
+    #
+    # @example
+    #   page_sections(:articles, Article, :class => 'article')
+    #   # will generate 'articles'
+    #
+    # @param [Symbol] the name used for the generated method
+    # @param [Class] the class to instantiate for each element
+    # @param [Hash] identifier how we find an element.  You can use a multiple parameters
+    #   by combining of any of the following except xpath.  The valid keys are:
+    #   * :class => Watir and Selenium
+    #   * :css => Selenium only
+    #   * :id => Watir and Selenium
+    #   * :index => Watir and Selenium
+    #   * :name => Watir and Selenium
+    #   * :xpath => Watir and Selenium
+    #
+    def page_sections(name, section_class, identifier)
+      define_method(name) do
+        platform.pages_for(identifier, section_class)
       end
     end
 

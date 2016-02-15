@@ -83,6 +83,7 @@ module PageObject
                          :span,
                          :table,
                          :cell,
+                         :row,
                          :image,
                          :form,
                          :list_item,
@@ -101,6 +102,8 @@ module PageObject
                          :canvas,
                          :audio,
                          :video,
+                         :b,
+                         :i,
                          :svg]
 
     def self.generate_locators(target)

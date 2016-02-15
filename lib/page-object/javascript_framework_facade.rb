@@ -1,6 +1,7 @@
 require 'page-object/javascript/jquery'
 require 'page-object/javascript/prototype'
 require 'page-object/javascript/yui'
+require 'page-object/javascript/angularjs'
 
 
 module PageObject
@@ -19,8 +20,8 @@ module PageObject
       #
       # Set the framework to use.
       #
-      # @param[Symbol] the framework to use.  :jquery and :prototype
-      # are supported
+      # @param[Symbol] the framework to use.  :jquery, :prototype, :yui,
+      # and :angularjs are supported
       #
       def framework=(framework)
         initialize_script_builder unless @builder
@@ -63,6 +64,7 @@ module PageObject
           :jquery => ::PageObject::Javascript::JQuery,
           :prototype => ::PageObject::Javascript::Prototype,
           :yui => ::PageObject::Javascript::YUI,
+          :angularjs => ::PageObject::Javascript::AngularJS
         }
       end
 

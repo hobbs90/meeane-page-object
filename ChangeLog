@@ -1,4 +1,32 @@
-=== Version 1.0.3
+=== Version 1.1.1 / 2016-1-7
+* Enhancements
+  * Added row accessor method and support for finding row elements directly (Thanks Ethan Hedrick)
+  * Added list_items method to UnorderedList to get an array of children.
+  * Speed optimizations for UnorderedList
+  * Added list_items method to OrderedList to get an array of children.
+  * Speed optimizations for OrderedList
+  * Added ability to check if a section is visible?, present?, or exists? (Thanks Donavan Stanley)
+  * Added support for the Italic (i) element (Thanks Sergey Morozov)
+  * Added size and location methods to all elements (Thanks Steve Jackson)
+  * Added width, height, and centre methods for elements (Thanks David Selby)
+  * Added missing right_click method for watir (Thanks David Selby)
+
+=== Version 1.1.0 / 2015-5-2
+* Enhancements
+  * Performance enhancements when initializing elements (Thanks Dane Andersen)
+  * Enabled button elements to return text when using selenium-webdriver.
+  * Added support for :index identifier in indexed properties.
+  * Added page_section and page_sections accessor methods which can specify a page object of elements on another page object.
+* Fixes
+  * Fixed issue causing exceptions when comparing equality of element to non-element objects.
+  * Fixed issue that causes indexed properties to return the same value for any index.
+
+=== Version 1.0.3 / 2014-12-9
+* Enhancements
+  * Added support for the bold tag (Thanks sedx)
+  * Added support for angularjs in wait_for_ajax (Thanks Owen Housden)
+  * Added hashes method to Table to return table contents as a Hash (Thanks Tobi)
+  * Fixed wait_for_expected_title so it detects if the title changes (Thanks Levi Wilson)
 * Fixes
   * Fixed issue that allows access to elements on other indexed properties (Thanks Dane Andersen)
   * Removed the method to clear radio buttons.  It didn't work on selenium and threw an exception on watir. (Thanks Justin Ko)
