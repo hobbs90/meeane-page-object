@@ -69,7 +69,7 @@ When you include this module numerous methods are added to your class that allow
 class LoginPage
   include PageObject
       
-  _(:username, :id => 'username')
+  text_field(:username, :id => 'username')
   text_field(:password, :id => 'password')
   button(:login, :id => 'login')
 end

@@ -80,6 +80,7 @@ Feature: Button
     | class  | index  |
     | name   | index  |
 
+
   Scenario: Finding a button dynamically
     When I find a button while the script is executing
     Then I should see that the button exists

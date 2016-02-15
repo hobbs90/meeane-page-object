@@ -84,6 +84,12 @@ class Page
   checkbox(:cb_name_index, :name => "cb_name", :index => 0)
   checkbox(:cb_label, :label => 'Checkbox')
 
+  # Collinson Style Radio Buttons
+  label(:individual, :for => 'individual')
+  label(:couple, :for => 'couple')
+  label(:family, :for => 'family')
+  label(:group, :for => 'group')
+
   radio_button(:milk_id, :id => 'milk_id')
   radio_button(:milk_name, :name => 'milk_name')
   radio_button(:milk_class, :class => 'milk_class')
