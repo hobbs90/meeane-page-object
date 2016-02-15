@@ -35,6 +35,8 @@ class WatirAccessorsTestPageObject
   canvas(:my_canvas, :id => 'canvas_id')
   audio(:acdc, :id => 'audio_id')
   video(:movie, :id => 'video_id')
+  b(:bold, :id => 'bold')
+  i(:italic, :id => 'italic')
 end
 
 class WatirBlockPageObject
@@ -129,6 +131,12 @@ class WatirBlockPageObject
   video :movie do |element|
     "video"
   end
+  b :bold do |element|
+    "b"
+  end
+  i :italic do |element|
+    "i"
+  end
 end
 
 describe PageObject::Accessors do
@@ -139,7 +147,7 @@ describe PageObject::Accessors do
   context "goto a page" do
 
     it "should navigate to a page when requested" do
-      watir_browser.should_receive(:goto)
+      expect(watir_browser).to receive(:goto)
       WatirAccessorsTestPageObject.new(watir_browser, true)
     end
 
@@ -154,32 +162,32 @@ describe PageObject::Accessors do
           super(b, v)
         end
       end
-      watir_browser.should_receive(:goto).with('custom')
+      expect(watir_browser).to receive(:goto).with('custom')
       SymbolPageUrl.new(watir_browser, true, 'custom')
 
-      watir_browser.should_receive(:goto).with('different')
-      SymbolPageUrl.new(watir_browser, true, 'different')      
+      expect(watir_browser).to receive(:goto).with('different')
+      SymbolPageUrl.new(watir_browser, true, 'different')
     end
 
     it "should not navigate to a page when not requested" do
-      watir_browser.should_not_receive(:goto)
+      expect(watir_browser).not_to receive(:goto)
       WatirAccessorsTestPageObject.new(watir_browser)
     end
 
     it "should not navigate to a page when 'page_url' not specified" do
-      watir_browser.should_not_receive(:goto)
+      expect(watir_browser).not_to receive(:goto)
       WatirBlockPageObject.new(watir_browser, true)
     end
 
     it "should provide the page url" do
-      watir_page_object.page_url_value.should == 'http://apple.com'
+      expect(watir_page_object.page_url_value).to eql 'http://apple.com'
     end
   end
 
   context "validating the page title" do
     it "should validate the title" do
-      watir_browser.should_receive(:title).and_return("Expected Title")
-      watir_page_object.should have_expected_title
+      expect(watir_browser).to receive(:title).and_return("Expected Title")
+      expect(watir_page_object).to have_expected_title
     end
 
     it "should validate the by regexp" do
@@ -187,20 +195,20 @@ describe PageObject::Accessors do
         include PageObject
         expected_title /\w+ \w+/
       end
-      watir_browser.should_receive(:title).and_return("Expected Title")
-      RegexpExpectedTitle.new(watir_browser).should have_expected_title
+      expect(watir_browser).to receive(:title).and_return("Expected Title")
+      expect(RegexpExpectedTitle.new(watir_browser)).to have_expected_title
     end
 
     it "should raise error when it does not have expected title" do
-      watir_browser.should_receive(:title).once.and_return("Not Expected")
+      expect(watir_browser).to receive(:title).once.and_return("Not Expected")
       expect { watir_page_object.has_expected_title? }.to raise_error
     end
   end
 
   context "validating the existence of an element" do
     it "should validate an element exists" do
-      watir_page_object.should_receive(:google_search_element).and_return(watir_browser)
-      watir_browser.should_receive(:when_present).and_return(true)
+      expect(watir_page_object).to receive(:google_search_element).and_return(watir_browser)
+      expect(watir_browser).to receive(:when_present).and_return(true)
       watir_page_object.has_expected_element?
     end
 
@@ -209,7 +217,34 @@ describe PageObject::Accessors do
         include PageObject
         expected_element :foo
       end
-      FakePage.new(watir_browser).should_not have_expected_element
+      expect(FakePage.new(watir_browser)).not_to have_expected_element
+    end
+  end
+
+  context "using element accessor" do
+    class WatirDefaultElementTagToElement
+      include PageObject
+      # verify that the explicit :element tag can be omitted
+      # element('button', :element, {:css => 'some css'})
+      element('button', { :css => 'some css' })
+      elements('button2', { :css => 'some css' })
+    end
+
+    let (:page) { WatirDefaultElementTagToElement.new(watir_browser) }
+
+    def mock_driver_for(tag)
+      expect(watir_browser).to receive(tag).with(:css => 'some css').and_return(watir_browser)
+    end
+
+    it "should default element tag to element" do
+      mock_driver_for :element
+      page.button_element
+    end
+
+    it "should default elements tag to element" do
+      mock_driver_for :elements
+      expect(watir_browser).to receive(:map).and_return([])
+      page.button2_elements.to_a
     end
   end
 
@@ -248,7 +283,7 @@ describe PageObject::Accessors do
     let(:default_identifier) { WatirDefaultIdentifier.new(watir_browser) }
 
     def mock_driver_for(tag)
-      watir_browser.should_receive(tag).with(:index => 0).and_return(watir_browser)
+      expect(watir_browser).to receive(tag).with(:index => 0).and_return(watir_browser)
     end
 
     it "should work with a text_field" do
@@ -303,7 +338,7 @@ describe PageObject::Accessors do
 
     it "should work for a table" do
       mock_driver_for :table
-      default_identifier.default_tab_element.should_not be_nil
+      expect(default_identifier.default_tab_element).not_to be_nil
     end
 
     it "should work for a cell" do
@@ -391,24 +426,24 @@ describe PageObject::Accessors do
   context "link accessors" do
     context "when called on a page object" do
       it "should generate accessor methods" do
-        watir_page_object.should respond_to(:google_search)
-        watir_page_object.should respond_to(:google_search_element)
+        expect(watir_page_object).to respond_to(:google_search)
+        expect(watir_page_object).to respond_to(:google_search_element)
       end
 
       it "should call a block on the element method when present" do
-        block_page_object.continue_element.should == "link"
+        expect(block_page_object.continue_element).to eql "link"
       end
     end
 
     it "should select a link" do
-      watir_browser.stub_chain(:link, :click)
+      expect(watir_browser).to receive_messages(link: watir_browser, click: watir_browser)
       watir_page_object.google_search
     end
 
     it "should return a link element" do
-      watir_browser.should_receive(:link).and_return(watir_browser)
+      expect(watir_browser).to receive(:link).and_return(watir_browser)
       element = watir_page_object.google_search_element
-      element.should be_instance_of PageObject::Elements::Link
+      expect(element).to be_instance_of PageObject::Elements::Link
     end
   end
 
@@ -416,33 +451,33 @@ describe PageObject::Accessors do
   describe "text_field accessors" do
     context "when called on a page object" do
       it "should generate accessor methods" do
-        watir_page_object.should respond_to(:first_name)
-        watir_page_object.should respond_to(:first_name=)
-        watir_page_object.should respond_to(:first_name_element)
-        watir_page_object.should respond_to(:first_name?)
+        expect(watir_page_object).to respond_to(:first_name)
+        expect(watir_page_object).to respond_to(:first_name=)
+        expect(watir_page_object).to respond_to(:first_name_element)
+        expect(watir_page_object).to respond_to(:first_name?)
       end
 
       it "should call a block on the element method when present" do
-        block_page_object.first_name_element.should == "text_field"
+        expect(block_page_object.first_name_element).to eql "text_field"
       end
     end
 
     it "should get the text from the text field element" do
-      watir_browser.should_receive(:text_field).and_return(watir_browser)
-      watir_browser.should_receive(:value).and_return('Kim')
-      watir_page_object.first_name.should == 'Kim'
+      expect(watir_browser).to receive(:text_field).and_return(watir_browser)
+      expect(watir_browser).to receive(:value).and_return('Kim')
+      expect(watir_page_object.first_name).to eql 'Kim'
     end
 
     it "should set some text on a text field element" do
-      watir_browser.should_receive(:text_field).and_return(watir_browser)
-      watir_browser.should_receive(:set).with('Kim')
+      expect(watir_browser).to receive(:text_field).and_return(watir_browser)
+      expect(watir_browser).to receive(:set).with('Kim')
       watir_page_object.first_name = 'Kim'
     end
 
     it "should retrieve a text field element" do
-      watir_browser.should_receive(:text_field).and_return(watir_browser)
+      expect(watir_browser).to receive(:text_field).and_return(watir_browser)
       element = watir_page_object.first_name_element
-      element.should be_instance_of PageObject::Elements::TextField
+      expect(element).to be_instance_of PageObject::Elements::TextField
     end
   end
 
@@ -450,147 +485,144 @@ describe PageObject::Accessors do
   describe "hidden field accessors" do
     context "when called on a page object" do
       it "should generate accessor methods" do
-        watir_page_object.should respond_to(:social_security_number)
-        watir_page_object.should respond_to(:social_security_number_element)
+        expect(watir_page_object).to respond_to(:social_security_number)
+        expect(watir_page_object).to respond_to(:social_security_number_element)
       end
 
       it "should call a block on the element method when present" do
-        block_page_object.secret_element.should == "hidden_field"
+        expect(block_page_object.secret_element).to eql "hidden_field"
       end
     end
 
     it "should get the text from a hidden field" do
-      watir_browser.should_receive(:hidden).and_return(watir_browser)
-      watir_browser.should_receive(:value).and_return("value")
-      watir_page_object.social_security_number.should == "value"
+      expect(watir_browser).to receive(:hidden).and_return(watir_browser)
+      expect(watir_browser).to receive(:value).and_return("value")
+      expect(watir_page_object.social_security_number).to eql "value"
     end
 
     it "should retrieve a hidden field element" do
-      watir_browser.should_receive(:hidden).and_return(watir_browser)
+      expect(watir_browser).to receive(:hidden).and_return(watir_browser)
       element = watir_page_object.social_security_number_element
-      element.should be_instance_of(PageObject::Elements::HiddenField)
+      expect(element).to be_instance_of(PageObject::Elements::HiddenField)
     end
   end
 
   describe "text area accessors" do
     context "when called on a page object" do
       it "should generate accessor methods" do
-        watir_page_object.should respond_to(:address)
-        watir_page_object.should respond_to(:address=)
-        watir_page_object.should respond_to(:address_element)
+        expect(watir_page_object).to respond_to(:address)
+        expect(watir_page_object).to respond_to(:address=)
+        expect(watir_page_object).to respond_to(:address_element)
       end
 
       it "should call a block on the element method when present" do
-        block_page_object.address_element.should == "text_area"
+        expect(block_page_object.address_element).to eql "text_area"
       end
     end
 
     it "should set some text on the text area" do
-      watir_browser.should_receive(:textarea).and_return(watir_browser)
-      watir_browser.should_receive(:set).with("123 main street")
+      expect(watir_browser).to receive(:textarea).and_return(watir_browser)
+      expect(watir_browser).to receive(:set).with("123 main street")
       watir_page_object.address = "123 main street"
     end
 
     it "should get the text from the text area" do
-      watir_browser.should_receive(:textarea).and_return(watir_browser)
-      watir_browser.should_receive(:value).and_return("123 main street")
-      watir_page_object.address.should == "123 main street"
+      expect(watir_browser).to receive(:textarea).and_return(watir_browser)
+      expect(watir_browser).to receive(:value).and_return("123 main street")
+      expect(watir_page_object.address).to eql "123 main street"
     end
 
     it "should retrieve a text area element" do
-      watir_browser.should_receive(:textarea).and_return(watir_browser)
+      expect(watir_browser).to receive(:textarea).and_return(watir_browser)
       element = watir_page_object.address_element
-      element.should be_instance_of PageObject::Elements::TextArea
+      expect(element).to be_instance_of PageObject::Elements::TextArea
     end
   end
 
   describe "select_list accessors" do
     context "when called on a page object" do
       it "should generate accessor methods" do
-        watir_page_object.should respond_to :state
-        watir_page_object.should respond_to :state=
-        watir_page_object.should respond_to(:state_element)
+        expect(watir_page_object).to respond_to :state
+        expect(watir_page_object).to respond_to :state=
+        expect(watir_page_object).to respond_to(:state_element)
       end
 
       it "should call a block on the element method when present" do
-        block_page_object.state_element.should == "select_list"
+        expect(block_page_object.state_element).to eql "select_list"
       end
     end
 
     it "should get the current item from a select list" do
       selected = "OH"
-      selected.should_receive(:selected?).and_return(selected)
-      selected.should_receive(:text).and_return("OH")
-      watir_browser.should_receive(:select_list).and_return watir_browser
-      watir_browser.should_receive(:options).and_return([selected])
-      watir_page_object.state.should == "OH"
+      expect(selected).to receive(:selected?).and_return(selected)
+      expect(selected).to receive(:text).and_return("OH")
+      expect(watir_browser).to receive(:select_list).and_return watir_browser
+      expect(watir_browser).to receive(:options).and_return([selected])
+      expect(watir_page_object.state).to eql "OH"
     end
 
     it "should set the current item of a select list" do
-      watir_browser.should_receive(:select_list).and_return watir_browser
-      watir_browser.should_receive(:select).with("OH")
+      expect(watir_browser).to receive(:select_list).and_return watir_browser
+      expect(watir_browser).to receive(:select).with("OH")
       watir_page_object.state = "OH"
     end
 
     it "should retreive the select list element" do
-      watir_browser.should_receive(:select_list).and_return(watir_browser)
+      expect(watir_browser).to receive(:select_list).and_return(watir_browser)
       element = watir_page_object.state_element
-      element.should be_instance_of PageObject::Elements::SelectList
+      expect(element).to be_instance_of PageObject::Elements::SelectList
     end
-    
+
     it "should return list of selection options" do
       option1 = double('option')
       option2 = double('option')
-      option1.should_receive(:text).and_return("CA")
-      option2.should_receive(:text).and_return("OH")
+      expect(option1).to receive(:text).and_return("CA")
+      expect(option2).to receive(:text).and_return("OH")
 
       select_element = double("select")
-      select_element.should_receive(:options).twice.and_return([option1, option2])
-      watir_page_object.should_receive(:state_element).and_return(select_element)
-      
-      watir_page_object.state_options.should == ["CA","OH"]
-    end
-    
-    
-  end
+      expect(select_element).to receive(:options).twice.and_return([option1, option2])
+      expect(watir_page_object).to receive(:state_element).and_return(select_element)
 
+      expect(watir_page_object.state_options).to eql ["CA","OH"]
+    end
+  end
 
   describe "check_box accessors" do
     context "when called on a page object" do
       it "should generate accessor methods" do
-        watir_page_object.should respond_to :check_active
-        watir_page_object.should respond_to :uncheck_active
-        watir_page_object.should respond_to :active_checked?
-        watir_page_object.should respond_to :active_element
+        expect(watir_page_object).to respond_to :check_active
+        expect(watir_page_object).to respond_to :uncheck_active
+        expect(watir_page_object).to respond_to :active_checked?
+        expect(watir_page_object).to respond_to :active_element
       end
 
       it "should call a block on the element method when present" do
-        block_page_object.active_element.should == "checkbox"
+        expect(block_page_object.active_element).to eql "checkbox"
       end
     end
 
     it "should check a check box element" do
-      watir_browser.should_receive(:checkbox).and_return(watir_browser)
-      watir_browser.should_receive(:set)
+      expect(watir_browser).to receive(:checkbox).and_return(watir_browser)
+      expect(watir_browser).to receive(:set)
       watir_page_object.check_active
     end
 
     it "should clear a check box element" do
-      watir_browser.should_receive(:checkbox).and_return(watir_browser)
-      watir_browser.should_receive(:clear)
+      expect(watir_browser).to receive(:checkbox).and_return(watir_browser)
+      expect(watir_browser).to receive(:clear)
       watir_page_object.uncheck_active
     end
 
     it "should know if a check box element is selected" do
-      watir_browser.should_receive(:checkbox).and_return(watir_browser)
-      watir_browser.should_receive(:set?).and_return(true)
-      watir_page_object.active_checked?.should be true
+      expect(watir_browser).to receive(:checkbox).and_return(watir_browser)
+      expect(watir_browser).to receive(:set?).and_return(true)
+      expect(watir_page_object.active_checked?).to be true
     end
 
     it "should retrieve a checkbox element" do
-      watir_browser.should_receive(:checkbox).and_return(watir_browser)
+      expect(watir_browser).to receive(:checkbox).and_return(watir_browser)
       element = watir_page_object.active_element
-      element.should be_instance_of PageObject::Elements::CheckBox
+      expect(element).to be_instance_of PageObject::Elements::CheckBox
     end
   end
 
@@ -598,398 +630,398 @@ describe PageObject::Accessors do
   describe "radio accessors" do
     context "when called on a page object" do
       it "should generate accessor methods" do
-        watir_page_object.should respond_to :select_first
-        watir_page_object.should respond_to :first_selected?
-        watir_page_object.should respond_to(:first_element)
+        expect(watir_page_object).to respond_to :select_first
+        expect(watir_page_object).to respond_to :first_selected?
+        expect(watir_page_object).to respond_to(:first_element)
       end
 
       it "should call a block on the element method when present" do
-        block_page_object.first_element.should == "radio_button"
+        expect(block_page_object.first_element).to eql "radio_button"
       end
     end
 
     it "should select a radio button" do
-      watir_browser.should_receive(:radio).and_return(watir_browser)
-      watir_browser.should_receive(:set)
+      expect(watir_browser).to receive(:radio).and_return(watir_browser)
+      expect(watir_browser).to receive(:set)
       watir_page_object.select_first
     end
 
     it "should determine if a radio is selected" do
-      watir_browser.should_receive(:radio).and_return(watir_browser)
-      watir_browser.should_receive(:set?)
+      expect(watir_browser).to receive(:radio).and_return(watir_browser)
+      expect(watir_browser).to receive(:set?)
       watir_page_object.first_selected?
     end
 
     it "should retrieve a radio button element" do
-      watir_browser.should_receive(:radio).and_return(watir_browser)
+      expect(watir_browser).to receive(:radio).and_return(watir_browser)
       element = watir_page_object.first_element
-      element.should be_instance_of PageObject::Elements::RadioButton
+      expect(element).to be_instance_of PageObject::Elements::RadioButton
     end
   end
 
   describe "button accessors" do
     context "when called on a page object" do
       it "should generate accessor methods" do
-        watir_page_object.should respond_to :click_me
-        watir_page_object.should respond_to :click_me_element
+        expect(watir_page_object).to respond_to :click_me
+        expect(watir_page_object).to respond_to :click_me_element
       end
 
       it "should call a block on the element method when present" do
-        block_page_object.click_me_element.should == "button"
+        expect(block_page_object.click_me_element).to eql "button"
       end
     end
 
     it "should be able to click a button" do
-      watir_browser.should_receive(:button).and_return(watir_browser)
-      watir_browser.should_receive(:click)
+      expect(watir_browser).to receive(:button).and_return(watir_browser)
+      expect(watir_browser).to receive(:click)
       watir_page_object.click_me
     end
 
     it "should retrieve a button element" do
-      watir_browser.should_receive(:button).and_return(watir_browser)
+      expect(watir_browser).to receive(:button).and_return(watir_browser)
       element = watir_page_object.click_me_element
-      element.should be_instance_of PageObject::Elements::Button
+      expect(element).to be_instance_of PageObject::Elements::Button
     end
   end
 
   describe "div accessors" do
     context "when called on a page object" do
       it "should generate accessor methods" do
-        watir_page_object.should respond_to(:message)
-        watir_page_object.should respond_to(:message_element)
+        expect(watir_page_object).to respond_to(:message)
+        expect(watir_page_object).to respond_to(:message_element)
       end
 
       it "should call a block on the element method when present" do
-        block_page_object.footer_element.should == "div"
+        expect(block_page_object.footer_element).to eql "div"
       end
     end
 
     it "should retrieve the text from a div" do
-      watir_browser.should_receive(:div).and_return(watir_browser)
-      watir_browser.should_receive(:text).and_return("Message from div")
-      watir_page_object.message.should == "Message from div"
+      expect(watir_browser).to receive(:div).and_return(watir_browser)
+      expect(watir_browser).to receive(:text).and_return("Message from div")
+      expect(watir_page_object.message).to eql "Message from div"
     end
 
     it "should retrieve the div element from the page" do
-      watir_browser.should_receive(:div).and_return(watir_browser)
+      expect(watir_browser).to receive(:div).and_return(watir_browser)
       element = watir_page_object.message_element
-      element.should be_instance_of PageObject::Elements::Div
+      expect(element).to be_instance_of PageObject::Elements::Div
     end
   end
 
   describe "span accessors" do
     context "when called on a page object" do
       it "should generate accessor methods" do
-        watir_page_object.should respond_to(:alert_span)
-        watir_page_object.should respond_to(:alert_span_element)
+        expect(watir_page_object).to respond_to(:alert_span)
+        expect(watir_page_object).to respond_to(:alert_span_element)
       end
 
       it "should call a block on the element method when present" do
-        block_page_object.alert_span_element.should == "span"
+        expect(block_page_object.alert_span_element).to eql "span"
       end
     end
 
     it "should retrieve the text from a span" do
-      watir_browser.should_receive(:span).and_return(watir_browser)
-      watir_browser.should_receive(:text).and_return("Alert")
-      watir_page_object.alert_span.should == "Alert"
+      expect(watir_browser).to receive(:span).and_return(watir_browser)
+      expect(watir_browser).to receive(:text).and_return("Alert")
+      expect(watir_page_object.alert_span).to eql "Alert"
     end
 
     it "should retrieve the span element from the page" do
-      watir_browser.should_receive(:span).and_return(watir_browser)
+      expect(watir_browser).to receive(:span).and_return(watir_browser)
       element = watir_page_object.alert_span_element
-      element.should be_instance_of PageObject::Elements::Span
+      expect(element).to be_instance_of PageObject::Elements::Span
     end
   end
 
   describe "table accessors" do
     context "when called on a page object" do
       it "should generate accessor methods" do
-        watir_page_object.should respond_to(:cart)
-        watir_page_object.should respond_to(:cart_element)
+        expect(watir_page_object).to respond_to(:cart)
+        expect(watir_page_object).to respond_to(:cart_element)
       end
 
       it "should call a block on the element method when present" do
-        block_page_object.cart_element.should == "table"
+        expect(block_page_object.cart_element).to eql "table"
       end
     end
 
     it "should retrieve the table element from the page" do
-      watir_browser.should_receive(:table).and_return(watir_browser)
+      expect(watir_browser).to receive(:table).and_return(watir_browser)
       element = watir_page_object.cart_element
-      element.should be_instance_of PageObject::Elements::Table
+      expect(element).to be_instance_of PageObject::Elements::Table
     end
   end
 
   describe "table cell accessors" do
     context "when called on a page object" do
       it "should generate accessor methods" do
-        watir_page_object.should respond_to(:total)
-        watir_page_object.should respond_to(:total_element)
+        expect(watir_page_object).to respond_to(:total)
+        expect(watir_page_object).to respond_to(:total_element)
       end
 
       it "should call a block on the element method when present" do
-        block_page_object.total_element.should == "cell"
+        expect(block_page_object.total_element).to eql "cell"
       end
     end
 
     it "should retrieve the text for the cell" do
-      watir_browser.should_receive(:td).and_return(watir_browser)
-      watir_browser.should_receive(:text).and_return('10.00')
-      watir_page_object.total.should == '10.00'
+      expect(watir_browser).to receive(:td).and_return(watir_browser)
+      expect(watir_browser).to receive(:text).and_return('10.00')
+      expect(watir_page_object.total).to eql '10.00'
     end
 
     it "should retrieve the cell element from the page" do
-      watir_browser.should_receive(:td).and_return(watir_browser)
+      expect(watir_browser).to receive(:td).and_return(watir_browser)
       element = watir_page_object.total_element
-      element.should be_instance_of PageObject::Elements::TableCell
+      expect(element).to be_instance_of PageObject::Elements::TableCell
     end
   end
 
   describe "image accessors" do
     context "when called on a page object" do
       it "should generate accessor methods" do
-        watir_page_object.should respond_to(:logo_element)
+        expect(watir_page_object).to respond_to(:logo_element)
       end
 
       it "should call a block on the element method when present" do
-        block_page_object.logo_element.should == "image"
+        expect(block_page_object.logo_element).to eql "image"
       end
     end
 
     it "should retrieve the image element from the page" do
-      watir_browser.should_receive(:image).and_return(watir_browser)
+      expect(watir_browser).to receive(:image).and_return(watir_browser)
       element = watir_page_object.logo_element
-      element.should be_instance_of PageObject::Elements::Image
+      expect(element).to be_instance_of PageObject::Elements::Image
     end
   end
 
   describe "form accessors" do
     context "when called on a page object" do
       it "should generate accessor methods" do
-        watir_page_object.should respond_to(:login_element)
+        expect(watir_page_object).to respond_to(:login_element)
       end
 
       it "should call a block on the element method when present" do
-        block_page_object.login_element.should == "form"
+        expect(block_page_object.login_element).to eql "form"
       end
     end
 
     it "should retrieve the form element from the page" do
-      watir_browser.should_receive(:form).and_return(watir_browser)
+      expect(watir_browser).to receive(:form).and_return(watir_browser)
       element = watir_page_object.login_element
-      element.should be_instance_of PageObject::Elements::Form
+      expect(element).to be_instance_of PageObject::Elements::Form
     end
   end
 
   describe "list item accessors" do
     context "when called on a page object" do
       it "should generate accessor methods" do
-        watir_page_object.should respond_to(:item_one)
-        watir_page_object.should respond_to(:item_one_element)
+        expect(watir_page_object).to respond_to(:item_one)
+        expect(watir_page_object).to respond_to(:item_one_element)
       end
 
       it "should call a block on the element method when present" do
-        block_page_object.item_one_element.should == "list_item"
+        expect(block_page_object.item_one_element).to eql "list_item"
       end
     end
 
     it "should retrieve the text from the list item" do
-      watir_browser.should_receive(:li).and_return(watir_browser)
-      watir_browser.should_receive(:text).and_return("value")
-      watir_page_object.item_one.should == "value"
+      expect(watir_browser).to receive(:li).and_return(watir_browser)
+      expect(watir_browser).to receive(:text).and_return("value")
+      expect(watir_page_object.item_one).to eql "value"
     end
 
     it "should retrieve the list item element from the page" do
-      watir_browser.should_receive(:li).and_return(watir_browser)
+      expect(watir_browser).to receive(:li).and_return(watir_browser)
       element = watir_page_object.item_one_element
-      element.should be_instance_of PageObject::Elements::ListItem
+      expect(element).to be_instance_of PageObject::Elements::ListItem
     end
   end
 
   describe "unordered list accessors" do
     context "when called on a page object" do
       it "should generate accessor methods" do
-        watir_page_object.should respond_to(:menu_element)
+        expect(watir_page_object).to respond_to(:menu_element)
       end
 
       it "should call a block on the element method when present" do
-        block_page_object.menu_element.should == "unordered_list"
+        expect(block_page_object.menu_element).to eql "unordered_list"
       end
     end
 
     it "should retrieve the element from the page" do
-      watir_browser.should_receive(:ul).and_return(watir_browser)
+      expect(watir_browser).to receive(:ul).and_return(watir_browser)
       element = watir_page_object.menu_element
-      element.should be_instance_of PageObject::Elements::UnorderedList
+      expect(element).to be_instance_of PageObject::Elements::UnorderedList
     end
   end
 
   describe "ordered list accessors" do
     context "when called on a page object" do
       it "should generate accessor methods" do
-        watir_page_object.should respond_to(:top_five_element)
+        expect(watir_page_object).to respond_to(:top_five_element)
       end
 
       it "should call a block on the element method when present" do
-        block_page_object.top_five_element.should == "ordered_list"
+        expect(block_page_object.top_five_element).to eql "ordered_list"
       end
     end
 
     it "should retrieve the element from the page" do
-      watir_browser.should_receive(:ol).and_return(watir_browser)
+      expect(watir_browser).to receive(:ol).and_return(watir_browser)
       element = watir_page_object.top_five_element
-      element.should be_instance_of PageObject::Elements::OrderedList
+      expect(element).to be_instance_of PageObject::Elements::OrderedList
     end
   end
 
   describe "h1 accessors" do
     context "when called on a page object" do
       it "should generate accessor methods" do
-        watir_page_object.should respond_to(:heading1)
-        watir_page_object.should respond_to(:heading1_element)
+        expect(watir_page_object).to respond_to(:heading1)
+        expect(watir_page_object).to respond_to(:heading1_element)
       end
 
       it "should call a block on the element method when present" do
-        block_page_object.heading1_element.should == "h1"
+        expect(block_page_object.heading1_element).to eql "h1"
       end
     end
 
     it "should retrieve the text from the h1" do
-      watir_browser.should_receive(:h1).and_return(watir_browser)
-      watir_browser.should_receive(:text).and_return("value")
-      watir_page_object.heading1.should == "value"
+      expect(watir_browser).to receive(:h1).and_return(watir_browser)
+      expect(watir_browser).to receive(:text).and_return("value")
+      expect(watir_page_object.heading1).to eql "value"
     end
 
     it "should retrieve the element from the page" do
-      watir_browser.should_receive(:h1).and_return(watir_browser)
+      expect(watir_browser).to receive(:h1).and_return(watir_browser)
       element = watir_page_object.heading1_element
-      element.should be_instance_of PageObject::Elements::Heading
+      expect(element).to be_instance_of PageObject::Elements::Heading
     end
   end
 
   describe "h2 accessors" do
     context "when called on a page object" do
       it "should generate accessor methods" do
-        watir_page_object.should respond_to(:heading2)
-        watir_page_object.should respond_to(:heading2_element)
+        expect(watir_page_object).to respond_to(:heading2)
+        expect(watir_page_object).to respond_to(:heading2_element)
       end
 
       it "should call a block on the element method when present" do
-        block_page_object.heading2_element.should == "h2"
+        expect(block_page_object.heading2_element).to eql "h2"
       end
     end
 
     it "should retrieve the text from the h2" do
-      watir_browser.should_receive(:h2).and_return(watir_browser)
-      watir_browser.should_receive(:text).and_return("value")
-      watir_page_object.heading2.should == "value"
+      expect(watir_browser).to receive(:h2).and_return(watir_browser)
+      expect(watir_browser).to receive(:text).and_return("value")
+      expect(watir_page_object.heading2).to eql "value"
     end
 
     it "should retrieve the element from the page" do
-      watir_browser.should_receive(:h2).and_return(watir_browser)
+      expect(watir_browser).to receive(:h2).and_return(watir_browser)
       element = watir_page_object.heading2_element
-      element.should be_instance_of PageObject::Elements::Heading
+      expect(element).to be_instance_of PageObject::Elements::Heading
     end
   end
 
   describe "h3 accessors" do
     context "when called on a page object" do
       it "should generate accessor methods" do
-        watir_page_object.should respond_to(:heading3)
-        watir_page_object.should respond_to(:heading3_element)
+        expect(watir_page_object).to respond_to(:heading3)
+        expect(watir_page_object).to respond_to(:heading3_element)
       end
 
       it "should call a block on the element method when present" do
-        block_page_object.heading3_element.should == "h3"
+        expect(block_page_object.heading3_element).to eql "h3"
       end
     end
 
     it "should retrieve the text from the h3" do
-      watir_browser.should_receive(:h3).and_return(watir_browser)
-      watir_browser.should_receive(:text).and_return("value")
-      watir_page_object.heading3.should == "value"
+      expect(watir_browser).to receive(:h3).and_return(watir_browser)
+      expect(watir_browser).to receive(:text).and_return("value")
+      expect(watir_page_object.heading3).to eql "value"
     end
 
     it "should retrieve the element from the page" do
-      watir_browser.should_receive(:h3).and_return(watir_browser)
+      expect(watir_browser).to receive(:h3).and_return(watir_browser)
       element = watir_page_object.heading3_element
-      element.should be_instance_of PageObject::Elements::Heading
+      expect(element).to be_instance_of PageObject::Elements::Heading
     end
   end
 
   describe "h4 accessors" do
     context "when called on a page object" do
       it "should generate accessor methods" do
-        watir_page_object.should respond_to(:heading4)
-        watir_page_object.should respond_to(:heading4_element)
+        expect(watir_page_object).to respond_to(:heading4)
+        expect(watir_page_object).to respond_to(:heading4_element)
       end
 
       it "should call a block on the element method when present" do
-        block_page_object.heading4_element.should == "h4"
+        expect(block_page_object.heading4_element).to eql "h4"
       end
     end
 
     it "should retrieve the text from the h4" do
-      watir_browser.should_receive(:h4).and_return(watir_browser)
-      watir_browser.should_receive(:text).and_return("value")
-      watir_page_object.heading4.should == "value"
+      expect(watir_browser).to receive(:h4).and_return(watir_browser)
+      expect(watir_browser).to receive(:text).and_return("value")
+      expect(watir_page_object.heading4).to eql "value"
     end
 
     it "should retrieve the element from the page" do
-      watir_browser.should_receive(:h4).and_return(watir_browser)
+      expect(watir_browser).to receive(:h4).and_return(watir_browser)
       element = watir_page_object.heading4_element
-      element.should be_instance_of PageObject::Elements::Heading
+      expect(element).to be_instance_of PageObject::Elements::Heading
     end
   end
 
   describe "h5 accessors" do
     context "when called on a page object" do
       it "should generate accessor methods" do
-        watir_page_object.should respond_to(:heading5)
-        watir_page_object.should respond_to(:heading5_element)
+        expect(watir_page_object).to respond_to(:heading5)
+        expect(watir_page_object).to respond_to(:heading5_element)
       end
 
       it "should call a block on the element method when present" do
-        block_page_object.heading5_element.should == "h5"
+        expect(block_page_object.heading5_element).to eql "h5"
       end
     end
 
     it "should retrieve the text from the h5" do
-      watir_browser.should_receive(:h5).and_return(watir_browser)
-      watir_browser.should_receive(:text).and_return("value")
-      watir_page_object.heading5.should == "value"
+      expect(watir_browser).to receive(:h5).and_return(watir_browser)
+      expect(watir_browser).to receive(:text).and_return("value")
+      expect(watir_page_object.heading5).to eql "value"
     end
 
     it "should retrieve the element from the page" do
-      watir_browser.should_receive(:h5).and_return(watir_browser)
+      expect(watir_browser).to receive(:h5).and_return(watir_browser)
       element = watir_page_object.heading5_element
-      element.should be_instance_of PageObject::Elements::Heading
+      expect(element).to be_instance_of PageObject::Elements::Heading
     end
   end
 
   describe "h6 accessors" do
     context "when called on a page object" do
       it "should generate accessor methods" do
-        watir_page_object.should respond_to(:heading6)
-        watir_page_object.should respond_to(:heading6_element)
+        expect(watir_page_object).to respond_to(:heading6)
+        expect(watir_page_object).to respond_to(:heading6_element)
       end
 
       it "should call a block on the element method when present" do
-        block_page_object.heading6_element.should == "h6"
+        expect(block_page_object.heading6_element).to eql "h6"
       end
     end
 
     it "should retrieve the text from the h6" do
-      watir_browser.should_receive(:h6).and_return(watir_browser)
-      watir_browser.should_receive(:text).and_return("value")
-      watir_page_object.heading6.should == "value"
+      expect(watir_browser).to receive(:h6).and_return(watir_browser)
+      expect(watir_browser).to receive(:text).and_return("value")
+      expect(watir_page_object.heading6).to eql "value"
     end
 
     it "should retrieve the element from the page" do
-      watir_browser.should_receive(:h6).and_return(watir_browser)
+      expect(watir_browser).to receive(:h6).and_return(watir_browser)
       element = watir_page_object.heading6_element
-      element.should be_instance_of PageObject::Elements::Heading
+      expect(element).to be_instance_of PageObject::Elements::Heading
     end
   end
 
@@ -997,98 +1029,98 @@ describe PageObject::Accessors do
   describe "p accessors" do
     context "when called on a page object" do
       it "should generate accessor methods" do
-        watir_page_object.should respond_to(:first_para)
-        watir_page_object.should respond_to(:first_para_element)
+        expect(watir_page_object).to respond_to(:first_para)
+        expect(watir_page_object).to respond_to(:first_para_element)
       end
 
       it "should call a block on the element method when present" do
-        block_page_object.first_para_element.should == "p"
+        expect(block_page_object.first_para_element).to eql "p"
       end
     end
 
     it "should retrieve the text from the p" do
-      watir_browser.should_receive(:p).and_return(watir_browser)
-      watir_browser.should_receive(:text).and_return("value")
-      watir_page_object.first_para.should == "value"
+      expect(watir_browser).to receive(:p).and_return(watir_browser)
+      expect(watir_browser).to receive(:text).and_return("value")
+      expect(watir_page_object.first_para).to eql "value"
     end
 
     it "should retrieve the element from the page" do
-      watir_browser.should_receive(:p).and_return(watir_browser)
+      expect(watir_browser).to receive(:p).and_return(watir_browser)
       element = watir_page_object.first_para_element
-      element.should be_instance_of PageObject::Elements::Paragraph
+      expect(element).to be_instance_of PageObject::Elements::Paragraph
     end
   end
 
   describe "file_field accessors" do
     context "when called on a page object" do
       it "should generate accessor methods" do
-        watir_page_object.should respond_to(:upload_me=)
-        watir_page_object.should respond_to(:upload_me_element)
+        expect(watir_page_object).to respond_to(:upload_me=)
+        expect(watir_page_object).to respond_to(:upload_me_element)
       end
 
       it "should call a block on the element method when present" do
-        block_page_object.a_file_element.should == "file_field"
+        expect(block_page_object.a_file_element).to eql "file_field"
       end
     end
 
     it "should set the file name" do
-      watir_browser.should_receive(:file_field).and_return(watir_browser)
-      watir_browser.should_receive(:set).with('some_file')
+      expect(watir_browser).to receive(:file_field).and_return(watir_browser)
+      expect(watir_browser).to receive(:set).with('some_file')
       watir_page_object.upload_me = 'some_file'
     end
 
     it "should retrieve a text field element" do
-      watir_browser.should_receive(:file_field).and_return(watir_browser)
+      expect(watir_browser).to receive(:file_field).and_return(watir_browser)
       element = watir_page_object.upload_me_element
-      element.should be_instance_of PageObject::Elements::FileField
+      expect(element).to be_instance_of PageObject::Elements::FileField
     end
   end
 
   describe "area accessors" do
     context "when called on a page object" do
       it "should generate accessor methods" do
-        watir_page_object.should respond_to(:img_area)
-        watir_page_object.should respond_to(:img_area_element)
+        expect(watir_page_object).to respond_to(:img_area)
+        expect(watir_page_object).to respond_to(:img_area_element)
       end
 
       it "should call a block on the element method when present" do
-        block_page_object.img_area_element.should == "area"
+        expect(block_page_object.img_area_element).to eql "area"
       end
     end
 
     it "should click on the area" do
-      watir_browser.should_receive(:area).and_return(watir_browser)
-      watir_browser.should_receive(:click)
+      expect(watir_browser).to receive(:area).and_return(watir_browser)
+      expect(watir_browser).to receive(:click)
       watir_page_object.img_area
     end
 
     it "should retrieve the element from the page" do
-      watir_browser.should_receive(:area).and_return(watir_browser)
+      expect(watir_browser).to receive(:area).and_return(watir_browser)
       element = watir_page_object.img_area_element
-      element.should be_instance_of PageObject::Elements::Area
+      expect(element).to be_instance_of PageObject::Elements::Area
     end
   end
 
   describe "canvas accessors" do
     context "when called on a page object" do
       it "should generate accessor methods" do
-        watir_page_object.should respond_to(:my_canvas_element)
+        expect(watir_page_object).to respond_to(:my_canvas_element)
       end
 
       it "should call a block on the element method when present" do
-        block_page_object.my_canvas_element.should == "canvas"
+        expect(block_page_object.my_canvas_element).to eql "canvas"
       end
     end
   end
-  
+
   describe "audio accessors" do
     context "when called on a page object" do
       it "should generate accessor methods" do
-        watir_page_object.should respond_to(:acdc_element)
+        expect(watir_page_object).to respond_to(:acdc_element)
       end
 
       it "should call a block on the element method when present" do
-        block_page_object.acdc_element.should == "audio"
+        expect(block_page_object.acdc_element).to eql "audio"
       end
     end
   end
@@ -1096,12 +1128,63 @@ describe PageObject::Accessors do
   describe "video accessors" do
     context "when called on a page object" do
       it "should generate accessor methods" do
-        watir_page_object.should respond_to(:movie_element)
+        expect(watir_page_object).to respond_to(:movie_element)
       end
 
       it "should call a block on the element method when present" do
-        block_page_object.movie_element.should == "video"
+        expect(block_page_object.movie_element).to eql "video"
       end
     end
   end
+
+  describe "b accessors" do
+    context "when called on a page object" do
+      it "should generate accessor methods" do
+        expect(watir_page_object).to respond_to(:bold)
+        expect(watir_page_object).to respond_to(:bold_element)
+      end
+
+      it "should call a block on the element method when present" do
+        expect(block_page_object.bold_element).to eql "b"
+      end
+    end
+
+    it "should retrieve the text from the b" do
+      expect(watir_browser).to receive(:b).and_return(watir_browser)
+      expect(watir_browser).to receive(:text).and_return("value")
+      expect(watir_page_object.bold).to eql "value"
+    end
+
+    it "should retrieve the element from the page" do
+      expect(watir_browser).to receive(:b).and_return(watir_browser)
+      element = watir_page_object.bold_element
+      expect(element).to be_instance_of PageObject::Elements::Bold
+    end
+  end
+
+  describe "i accessors" do
+    context "when called on a page object" do
+      it "should generate accessor methods" do
+        expect(watir_page_object).to respond_to(:italic)
+        expect(watir_page_object).to respond_to(:italic_element)
+      end
+
+      it "should call a block on the element method when present" do
+        expect(block_page_object.italic_element).to eql "i"
+      end
+    end
+
+    it "should retrieve the text from the i" do
+      expect(watir_browser).to receive(:i).and_return(watir_browser)
+      expect(watir_browser).to receive(:text).and_return("value")
+      expect(watir_page_object.italic).to eql "value"
+    end
+
+    it "should retrieve the element from the page" do
+      expect(watir_browser).to receive(:i).and_return(watir_browser)
+      element = watir_page_object.italic_element
+      expect(element).to be_instance_of PageObject::Elements::Italic
+    end
+  end
+
 end

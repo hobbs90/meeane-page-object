@@ -8,13 +8,13 @@ describe PageObject::Elements::RadioButton do
     it "should map watir types to same" do
       [:class, :id, :index, :name, :value, :xpath].each do |t|
         identifier = radiobutton.watir_identifier_for t => 'value'
-        identifier.keys.first.should == t
+        expect(identifier.keys.first).to eql t
       end
     end
     it "should map selenium types to same" do
       [:class, :id, :name, :xpath, :value, :index].each do |t|
         key, value = radiobutton.selenium_identifier_for t => 'value'
-        key.should == t
+        expect(key).to eql t
       end
     end
   end
@@ -22,7 +22,7 @@ describe PageObject::Elements::RadioButton do
   describe "interface" do
 
     it "should register as type :radio" do
-      ::PageObject::Elements.element_class_for(:input, :radio).should == ::PageObject::Elements::RadioButton
+      expect(::PageObject::Elements.element_class_for(:input, :radio)).to eql ::PageObject::Elements::RadioButton
     end
     
     context "for selenium" do
@@ -30,14 +30,14 @@ describe PageObject::Elements::RadioButton do
       let(:radio_button) { PageObject::Elements::RadioButton.new(selenium_rb, :platform => :selenium_webdriver) }
 
       it "should select" do
-        selenium_rb.should_receive(:click)
-        selenium_rb.should_receive(:selected?).and_return(false)
+        expect(selenium_rb).to receive(:click)
+        expect(selenium_rb).to receive(:selected?).and_return(false)
         radio_button.select
       end
       
       it "should know if it is selected" do
-        selenium_rb.should_receive(:selected?).and_return(true)
-        radio_button.should be_selected
+        expect(selenium_rb).to receive(:selected?).and_return(true)
+        expect(radio_button).to be_selected
       end
     end
   end

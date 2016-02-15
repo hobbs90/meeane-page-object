@@ -48,9 +48,9 @@ describe "Widget PageObject Extensions" do
       let(:watir_page_object) { WidgetTestPageObject.new(watir_browser) }
 
       it "should find a gxt_table element" do
-        watir_browser.should_receive(:div).with(:id => 'blah').and_return(watir_browser)
+        expect(watir_browser).to receive(:div).with(:id => 'blah').and_return(watir_browser)
         element = watir_page_object.gxt_table_element(:id => 'blah')
-        element.should be_instance_of GxtTable
+        expect(element).to be_instance_of GxtTable
       end
     end
 
@@ -59,9 +59,9 @@ describe "Widget PageObject Extensions" do
       let(:selenium_page_object) { WidgetTestPageObject.new(selenium_browser) }
 
       it "should find a gxt_table element" do
-        selenium_browser.should_receive(:find_element).with(:id, 'blah').and_return(selenium_browser)
+        expect(selenium_browser).to receive(:find_element).with(:id, 'blah').and_return(selenium_browser)
         element = selenium_page_object.gxt_table_element(:id => 'blah')
-        element.should be_instance_of GxtTable
+        expect(element).to be_instance_of GxtTable
       end
     end
   end
@@ -80,12 +80,12 @@ describe "Widget PageObject Extensions" do
       let(:default_identifier) { WatirDefaultIdentifier.new(watir_browser) }
 
       def mock_driver_for(tag)
-        watir_browser.should_receive(tag).with(:index => 0).and_return(watir_browser)
+        expect(watir_browser).to receive(tag).with(:index => 0).and_return(watir_browser)
       end
 
       it "should work for a gxt_table" do
         mock_driver_for :div
-        default_identifier.default_gxt_table_element.should_not be_nil
+        expect(default_identifier.default_gxt_table_element).not_to be_nil
       end
 
     end
@@ -93,38 +93,38 @@ describe "Widget PageObject Extensions" do
     describe "gxt_table accessors" do
       context "when called on a page object" do
         it "should generate accessor methods" do
-          watir_page_object.should respond_to(:a_table_element)
+          expect(watir_page_object).to respond_to(:a_table_element)
         end
 
         it "should generate multiple accessor methods" do
-          watir_page_object.should respond_to(:some_table_elements)
+          expect(watir_page_object).to respond_to(:some_table_elements)
         end
 
         it "should call a block on the element method when present" do
-          watir_page_object.gxt_block_table_element.should == "block_gxt_table"
+          expect(watir_page_object.gxt_block_table_element).to eql "block_gxt_table"
         end
 
         it "should call a block on the elements method when present" do
-          watir_page_object.gxt_multiple_block_table_elements.should == "multiple_block_gxt_table"
+          expect(watir_page_object.gxt_multiple_block_table_elements).to eql "multiple_block_gxt_table"
         end
       end
 
       it "should retrieve the table element from the page" do
-        watir_browser.should_receive(:div).and_return(watir_browser)
+        expect(watir_browser).to receive(:div).and_return(watir_browser)
         element = watir_page_object.a_table_element
-        element.should be_instance_of GxtTable
+        expect(element).to be_instance_of GxtTable
       end
 
       it "should retrieve all table elements from the page" do
-        watir_browser.should_receive(:divs).and_return([watir_browser])
+        expect(watir_browser).to receive(:divs).and_return([watir_browser])
         element = watir_page_object.some_table_elements
-        element[0].should be_instance_of GxtTable
+        expect(element[0]).to be_instance_of GxtTable
       end
 
       it "should be able to specify the plural form" do
-        watir_browser.should_receive(:divs).and_return([watir_browser])
+        expect(watir_browser).to receive(:divs).and_return([watir_browser])
         element = watir_page_object.matrix_elements
-        element[0].should be_instance_of WidgetMatrix
+        expect(element[0]).to be_instance_of WidgetMatrix
       end
     end
   end
@@ -134,14 +134,14 @@ describe "Widget PageObject Extensions" do
       it "should map watir types to same" do
         [:class, :id, :index, :xpath].each do |t|
           identifier = GxtTable.watir_identifier_for t => 'value'
-          identifier.keys.first.should == t
+          expect(identifier.keys.first).to eql t
         end
       end
 
       it "should map selenium types to same" do
         [:class, :id, :index, :name, :xpath].each do |t|
           key, value = GxtTable.selenium_identifier_for t => 'value'
-          key.should == t
+          expect(key).to eql t
         end
       end
     end
@@ -150,23 +150,23 @@ describe "Widget PageObject Extensions" do
       let(:gxt_table_element) { double('gxt_table_element') }
 
       before(:each) do
-        gxt_table_element.stub(:[]).and_return(gxt_table_element)
-        gxt_table_element.stub(:find_elements).and_return(gxt_table_element)
+        allow(gxt_table_element).to receive(:[]).and_return(gxt_table_element)
+        allow(gxt_table_element).to receive(:find_elements).and_return(gxt_table_element)
       end
 
       context "for watir" do
         let(:watir_table) { GxtTable.new(gxt_table_element, :platform => :watir_webdriver) }
 
         it "should return a table row when indexed" do
-          gxt_table_element.stub(:[]).with(1).and_return(gxt_table_element)
-          watir_table[1].should be_instance_of PageObject::Elements::TableRow
+          allow(gxt_table_element).to receive(:[]).with(1).and_return(gxt_table_element)
+          expect(watir_table[1]).to be_instance_of PageObject::Elements::TableRow
         end
 
         it "should return the number of rows" do
-          gxt_table_element.stub(:wd).and_return(gxt_table_element)
-          gxt_table_element.should_receive(:find_elements).with(:xpath, ".//descendant::tr").and_return(gxt_table_element)
-          gxt_table_element.should_receive(:size).and_return(2)
-          watir_table.rows.should == 2
+          allow(gxt_table_element).to receive(:wd).and_return(gxt_table_element)
+          expect(gxt_table_element).to receive(:find_elements).with(:xpath, ".//descendant::tr").and_return(gxt_table_element)
+          expect(gxt_table_element).to receive(:size).and_return(2)
+          expect(watir_table.rows).to eql 2
         end
       end
 
@@ -174,21 +174,21 @@ describe "Widget PageObject Extensions" do
         let(:selenium_table) { GxtTable.new(gxt_table_element, :platform => :selenium_webdriver) }
 
         it "should return a table row when indexed" do
-          gxt_table_element.should_receive(:find_elements).with(:xpath, ".//descendant::tr").and_return(gxt_table_element)
-          selenium_table[1].should be_instance_of PageObject::Elements::TableRow
+          expect(gxt_table_element).to receive(:find_elements).with(:xpath, ".//descendant::tr").and_return(gxt_table_element)
+          expect(selenium_table[1]).to be_instance_of PageObject::Elements::TableRow
         end
 
         it "should return the number of rows" do
-          gxt_table_element.should_receive(:find_elements).with(:xpath, ".//descendant::tr").and_return(gxt_table_element)
-          gxt_table_element.should_receive(:size).and_return(2)
-          selenium_table.rows.should == 2
+          expect(gxt_table_element).to receive(:find_elements).with(:xpath, ".//descendant::tr").and_return(gxt_table_element)
+          expect(gxt_table_element).to receive(:size).and_return(2)
+          expect(selenium_table.rows).to eql 2
         end
 
         it "should iterate over the table rows" do
-          selenium_table.should_receive(:rows).and_return(2)
+          expect(selenium_table).to receive(:rows).and_return(2)
           count = 0
           selenium_table.each { |e| count += 1 }
-          count.should == 2
+          expect(count).to eql 2
         end
       end
     end
@@ -202,7 +202,7 @@ describe "Widget PageObject Extensions" do
       end
 
       it "should find a nested gxt_table" do
-        @watir_driver.should_receive(:div).and_return(@watir_driver)
+        expect(@watir_driver).to receive(:div).and_return(@watir_driver)
         @watir_element.gxt_table_element
       end
     end
@@ -214,7 +214,7 @@ describe "Widget PageObject Extensions" do
       end
 
       it "should find a nested gxt_table" do
-        @selenium_driver.should_receive(:find_element).and_return(@selenium_driver)
+        expect(@selenium_driver).to receive(:find_element).and_return(@selenium_driver)
         @selenium_element.gxt_table_element
       end
     end

@@ -37,6 +37,18 @@ module PageObject
         self[-1]
       end
 
+      #
+      # return the table as hashes
+      #
+      # @return Hash
+      #
+      def hashes
+        headers = self.first_row.map(&:text)
+        self.entries[1..-1].map do |row|
+          Hash[headers.zip(row.map(&:text))]
+        end
+      end
+
       protected
 
       def child_xpath
