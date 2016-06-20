@@ -31,5 +31,5 @@ When /^I select the first check box while the script is executing$/ do
 end
 
 Then /^I should see that the checkbox exists$/ do
-  @page.button_id?.should == true
+  @page.cb_id?.should == true
 end
